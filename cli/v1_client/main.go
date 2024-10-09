@@ -33,6 +33,14 @@ func runEventStream(client pb.TheSocialRobotClient) {
 	if err != nil {
 		log.Fatalf("client.EventStream failed: %v", err)
 	}
+
+	for i := 0; i < 5; i++ {
+		event := &pb.ClientEvent{Id: int32(i + 1)}
+		if err := stream.Send(event); err != nil {
+			log.Fatalf("client.EventStream: stream.Send(%v) failed: %v", event, err)
+		}
+	}
+
 	waitc := make(chan struct{})
 	go func() {
 		for {
@@ -53,10 +61,10 @@ func runEventStream(client pb.TheSocialRobotClient) {
 			}
 		}
 	}()
-	event := &pb.ClientEvent{Id: 2}
-	if err := stream.Send(event); err != nil {
-		log.Fatalf("client.EventStream: stream.Send(%v) failed: %v", event, err)
-	}
+	//event := &pb.ClientEvent{Id: 2}
+	//if err := stream.Send(event); err != nil {
+	//	log.Fatalf("client.EventStream: stream.Send(%v) failed: %v", event, err)
+	//}
 	stream.CloseSend()
 	<-waitc
 }

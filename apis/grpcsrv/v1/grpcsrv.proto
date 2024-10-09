@@ -16,6 +16,9 @@ message ClientEvent {
 message Say {
   string text = 1;
 }
+message Print {
+  string text = 1;
+}
 
 message Action {
   // delay in milliseconds before triggering the action
@@ -24,6 +27,7 @@ message Action {
   int32 delay = 1;
   oneof action {
     Say say = 2;
+    Print print = 3;
   }
 }
 
