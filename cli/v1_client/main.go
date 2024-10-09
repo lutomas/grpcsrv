@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"time"
@@ -35,9 +36,10 @@ func runEventStream(client pb.TheSocialRobotClient) {
 		log.Fatalf("client.EventStream failed: %v", err)
 	}
 
-	event := &pb.ClientEvent{Id: int32(0)}
-	if err := stream.Send(event); err != nil {
-		log.Fatalf("client.EventStream: stream.Send(%v) failed: %v", event, err)
+	clientEvent := int32(0)
+	startEvent := &pb.ClientEvent{Id: fmt.Sprintf("client:%d", clientEvent), Action: &pb.ClientEvent_Start{}}
+	if err := stream.Send(startEvent); err != nil {
+		log.Fatalf("client.EventStream: stream.Send(%v) failed: %v", startEvent, err)
 	}
 
 	waitc := make(chan struct{})
@@ -54,21 +56,17 @@ func runEventStream(client pb.TheSocialRobotClient) {
 			if err != nil {
 				log.Fatalf("client.EventStream failed: %v", err)
 			}
-			log.Printf("Got message %d", in.Id)
-			for _, action := range in.Actions {
-				switch op := action.Action.(type) {
-				case *pb.Action_Say:
-					log.Printf("delay %d, say %s", action.Delay, op.Say.Text)
-				case *pb.Action_Date:
-					log.Printf("delay %d, date %s", action.Delay, op.Date.Text)
-				}
+			log.Printf("Got message| id: %s; date: %s", in.Id, in.Date)
+			clientEvent = clientEvent + 1
+			callbackEvent := &pb.ClientEvent{Id: fmt.Sprintf("client:%d", clientEvent), Action: &pb.ClientEvent_Callback{
+				Callback: &pb.Callback{Event: in},
+			}}
+			if err := stream.Send(callbackEvent); err != nil {
+				log.Fatalf("client.EventStream: stream.Send(%v) failed: %v", callbackEvent, err)
 			}
 		}
 	}()
-	//event := &pb.ClientEvent{Id: 2}
-	//if err := stream.Send(event); err != nil {
-	//	log.Fatalf("client.EventStream: stream.Send(%v) failed: %v", event, err)
-	//}
+
 	defer stream.CloseSend()
 	<-waitc
 }

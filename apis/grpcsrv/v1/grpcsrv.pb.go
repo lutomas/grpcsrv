@@ -20,19 +20,109 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Start struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *Start) Reset() {
+	*x = Start{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Start) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Start) ProtoMessage() {}
+
+func (x *Start) ProtoReflect() protoreflect.Message {
+	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Start.ProtoReflect.Descriptor instead.
+func (*Start) Descriptor() ([]byte, []int) {
+	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{0}
+}
+
+type Callback struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Event *ServerEvent `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
+}
+
+func (x *Callback) Reset() {
+	*x = Callback{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Callback) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Callback) ProtoMessage() {}
+
+func (x *Callback) ProtoReflect() protoreflect.Message {
+	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Callback.ProtoReflect.Descriptor instead.
+func (*Callback) Descriptor() ([]byte, []int) {
+	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Callback) GetEvent() *ServerEvent {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
 // event from robot (the body) containing current state
 type ClientEvent struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Types that are assignable to Action:
+	//
+	//	*ClientEvent_Start
+	//	*ClientEvent_Callback
+	Action isClientEvent_Action `protobuf_oneof:"action"`
 }
 
 func (x *ClientEvent) Reset() {
 	*x = ClientEvent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[0]
+		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -45,7 +135,7 @@ func (x *ClientEvent) String() string {
 func (*ClientEvent) ProtoMessage() {}
 
 func (x *ClientEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[0]
+	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,15 +148,52 @@ func (x *ClientEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientEvent.ProtoReflect.Descriptor instead.
 func (*ClientEvent) Descriptor() ([]byte, []int) {
-	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{0}
+	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *ClientEvent) GetId() int32 {
+func (x *ClientEvent) GetId() string {
 	if x != nil {
 		return x.Id
 	}
-	return 0
+	return ""
 }
+
+func (m *ClientEvent) GetAction() isClientEvent_Action {
+	if m != nil {
+		return m.Action
+	}
+	return nil
+}
+
+func (x *ClientEvent) GetStart() *Start {
+	if x, ok := x.GetAction().(*ClientEvent_Start); ok {
+		return x.Start
+	}
+	return nil
+}
+
+func (x *ClientEvent) GetCallback() *Callback {
+	if x, ok := x.GetAction().(*ClientEvent_Callback); ok {
+		return x.Callback
+	}
+	return nil
+}
+
+type isClientEvent_Action interface {
+	isClientEvent_Action()
+}
+
+type ClientEvent_Start struct {
+	Start *Start `protobuf:"bytes,2,opt,name=start,proto3,oneof"`
+}
+
+type ClientEvent_Callback struct {
+	Callback *Callback `protobuf:"bytes,3,opt,name=callback,proto3,oneof"`
+}
+
+func (*ClientEvent_Start) isClientEvent_Action() {}
+
+func (*ClientEvent_Callback) isClientEvent_Action() {}
 
 type Say struct {
 	state         protoimpl.MessageState
@@ -79,7 +206,7 @@ type Say struct {
 func (x *Say) Reset() {
 	*x = Say{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[1]
+		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -92,7 +219,7 @@ func (x *Say) String() string {
 func (*Say) ProtoMessage() {}
 
 func (x *Say) ProtoReflect() protoreflect.Message {
-	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[1]
+	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -105,7 +232,7 @@ func (x *Say) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Say.ProtoReflect.Descriptor instead.
 func (*Say) Descriptor() ([]byte, []int) {
-	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{1}
+	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Say) GetText() string {
@@ -126,7 +253,7 @@ type Date struct {
 func (x *Date) Reset() {
 	*x = Date{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[2]
+		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -139,7 +266,7 @@ func (x *Date) String() string {
 func (*Date) ProtoMessage() {}
 
 func (x *Date) ProtoReflect() protoreflect.Message {
-	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[2]
+	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -152,7 +279,7 @@ func (x *Date) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Date.ProtoReflect.Descriptor instead.
 func (*Date) Descriptor() ([]byte, []int) {
-	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{2}
+	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Date) GetText() string {
@@ -167,21 +294,13 @@ type Action struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// delay in milliseconds before triggering the action
-	// could use the Duration type here, but don't think we need nanosecond
-	// precision and the second/nanosecond split complicates things
-	Delay int32 `protobuf:"varint,1,opt,name=delay,proto3" json:"delay,omitempty"`
-	// Types that are assignable to Action:
-	//
-	//	*Action_Say
-	//	*Action_Date
-	Action isAction_Action `protobuf_oneof:"action"`
+	Action *Date `protobuf:"bytes,1,opt,name=action,proto3" json:"action,omitempty"`
 }
 
 func (x *Action) Reset() {
 	*x = Action{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[3]
+		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -194,7 +313,7 @@ func (x *Action) String() string {
 func (*Action) ProtoMessage() {}
 
 func (x *Action) ProtoReflect() protoreflect.Message {
-	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[3]
+	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -207,52 +326,15 @@ func (x *Action) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Action.ProtoReflect.Descriptor instead.
 func (*Action) Descriptor() ([]byte, []int) {
-	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{3}
+	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *Action) GetDelay() int32 {
+func (x *Action) GetAction() *Date {
 	if x != nil {
-		return x.Delay
-	}
-	return 0
-}
-
-func (m *Action) GetAction() isAction_Action {
-	if m != nil {
-		return m.Action
+		return x.Action
 	}
 	return nil
 }
-
-func (x *Action) GetSay() *Say {
-	if x, ok := x.GetAction().(*Action_Say); ok {
-		return x.Say
-	}
-	return nil
-}
-
-func (x *Action) GetDate() *Date {
-	if x, ok := x.GetAction().(*Action_Date); ok {
-		return x.Date
-	}
-	return nil
-}
-
-type isAction_Action interface {
-	isAction_Action()
-}
-
-type Action_Say struct {
-	Say *Say `protobuf:"bytes,2,opt,name=say,proto3,oneof"`
-}
-
-type Action_Date struct {
-	Date *Date `protobuf:"bytes,3,opt,name=date,proto3,oneof"`
-}
-
-func (*Action_Say) isAction_Action() {}
-
-func (*Action_Date) isAction_Action() {}
 
 // message from brain to body, instructing the body do take one or more actions
 type ServerEvent struct {
@@ -260,14 +342,14 @@ type ServerEvent struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id      int32     `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Actions []*Action `protobuf:"bytes,2,rep,name=actions,proto3" json:"actions,omitempty"`
+	Id   string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Date string `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
 }
 
 func (x *ServerEvent) Reset() {
 	*x = ServerEvent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[4]
+		mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -280,7 +362,7 @@ func (x *ServerEvent) String() string {
 func (*ServerEvent) ProtoMessage() {}
 
 func (x *ServerEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[4]
+	mi := &file_grpcsrv_v1_grpcsrv_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -293,21 +375,21 @@ func (x *ServerEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerEvent.ProtoReflect.Descriptor instead.
 func (*ServerEvent) Descriptor() ([]byte, []int) {
-	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{4}
+	return file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *ServerEvent) GetId() int32 {
+func (x *ServerEvent) GetId() string {
 	if x != nil {
 		return x.Id
 	}
-	return 0
+	return ""
 }
 
-func (x *ServerEvent) GetActions() []*Action {
+func (x *ServerEvent) GetDate() string {
 	if x != nil {
-		return x.Actions
+		return x.Date
 	}
-	return nil
+	return ""
 }
 
 var File_grpcsrv_v1_grpcsrv_proto protoreflect.FileDescriptor
@@ -315,33 +397,39 @@ var File_grpcsrv_v1_grpcsrv_proto protoreflect.FileDescriptor
 var file_grpcsrv_v1_grpcsrv_proto_rawDesc = []byte{
 	0x0a, 0x18, 0x67, 0x72, 0x70, 0x63, 0x73, 0x72, 0x76, 0x2f, 0x76, 0x31, 0x2f, 0x67, 0x72, 0x70,
 	0x63, 0x73, 0x72, 0x76, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0e, 0x74, 0x68, 0x65, 0x73,
-	0x6f, 0x63, 0x69, 0x61, 0x6c, 0x72, 0x6f, 0x62, 0x6f, 0x74, 0x22, 0x1d, 0x0a, 0x0b, 0x43, 0x6c,
-	0x69, 0x65, 0x6e, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x22, 0x19, 0x0a, 0x03, 0x53, 0x61, 0x79,
-	0x12, 0x12, 0x0a, 0x04, 0x74, 0x65, 0x78, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
-	0x74, 0x65, 0x78, 0x74, 0x22, 0x1a, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x65, 0x12, 0x12, 0x0a, 0x04,
-	0x74, 0x65, 0x78, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x65, 0x78, 0x74,
-	0x22, 0x7d, 0x0a, 0x06, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a, 0x05, 0x64, 0x65,
-	0x6c, 0x61, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x64, 0x65, 0x6c, 0x61, 0x79,
-	0x12, 0x27, 0x0a, 0x03, 0x73, 0x61, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e,
-	0x74, 0x68, 0x65, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x72, 0x6f, 0x62, 0x6f, 0x74, 0x2e, 0x53,
-	0x61, 0x79, 0x48, 0x00, 0x52, 0x03, 0x73, 0x61, 0x79, 0x12, 0x2a, 0x0a, 0x04, 0x64, 0x61, 0x74,
-	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x74, 0x68, 0x65, 0x73, 0x6f, 0x63,
-	0x69, 0x61, 0x6c, 0x72, 0x6f, 0x62, 0x6f, 0x74, 0x2e, 0x44, 0x61, 0x74, 0x65, 0x48, 0x00, 0x52,
-	0x04, 0x64, 0x61, 0x74, 0x65, 0x42, 0x08, 0x0a, 0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x22,
-	0x4f, 0x0a, 0x0b, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x0e,
-	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x12, 0x30,
-	0x0a, 0x07, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32,
-	0x16, 0x2e, 0x74, 0x68, 0x65, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x72, 0x6f, 0x62, 0x6f, 0x74,
-	0x2e, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x07, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73,
-	0x32, 0x5f, 0x0a, 0x0e, 0x54, 0x68, 0x65, 0x53, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x52, 0x6f, 0x62,
-	0x6f, 0x74, 0x12, 0x4d, 0x0a, 0x0b, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x53, 0x74, 0x72, 0x65, 0x61,
-	0x6d, 0x12, 0x1b, 0x2e, 0x74, 0x68, 0x65, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x72, 0x6f, 0x62,
-	0x6f, 0x74, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x1a, 0x1b,
+	0x6f, 0x63, 0x69, 0x61, 0x6c, 0x72, 0x6f, 0x62, 0x6f, 0x74, 0x22, 0x07, 0x0a, 0x05, 0x53, 0x74,
+	0x61, 0x72, 0x74, 0x22, 0x3d, 0x0a, 0x08, 0x43, 0x61, 0x6c, 0x6c, 0x62, 0x61, 0x63, 0x6b, 0x12,
+	0x31, 0x0a, 0x05, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b,
 	0x2e, 0x74, 0x68, 0x65, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x72, 0x6f, 0x62, 0x6f, 0x74, 0x2e,
-	0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x22, 0x00, 0x28, 0x01, 0x30,
-	0x01, 0x42, 0x11, 0x5a, 0x0f, 0x61, 0x70, 0x69, 0x73, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x73, 0x72,
-	0x76, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x05, 0x65, 0x76, 0x65,
+	0x6e, 0x74, 0x22, 0x8e, 0x01, 0x0a, 0x0b, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x45, 0x76, 0x65,
+	0x6e, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
+	0x69, 0x64, 0x12, 0x2d, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x72, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x15, 0x2e, 0x74, 0x68, 0x65, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x72, 0x6f, 0x62,
+	0x6f, 0x74, 0x2e, 0x53, 0x74, 0x61, 0x72, 0x74, 0x48, 0x00, 0x52, 0x05, 0x73, 0x74, 0x61, 0x72,
+	0x74, 0x12, 0x36, 0x0a, 0x08, 0x63, 0x61, 0x6c, 0x6c, 0x62, 0x61, 0x63, 0x6b, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x74, 0x68, 0x65, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x72,
+	0x6f, 0x62, 0x6f, 0x74, 0x2e, 0x43, 0x61, 0x6c, 0x6c, 0x62, 0x61, 0x63, 0x6b, 0x48, 0x00, 0x52,
+	0x08, 0x63, 0x61, 0x6c, 0x6c, 0x62, 0x61, 0x63, 0x6b, 0x42, 0x08, 0x0a, 0x06, 0x61, 0x63, 0x74,
+	0x69, 0x6f, 0x6e, 0x22, 0x19, 0x0a, 0x03, 0x53, 0x61, 0x79, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x65,
+	0x78, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x65, 0x78, 0x74, 0x22, 0x1a,
+	0x0a, 0x04, 0x44, 0x61, 0x74, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x65, 0x78, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x65, 0x78, 0x74, 0x22, 0x36, 0x0a, 0x06, 0x41, 0x63,
+	0x74, 0x69, 0x6f, 0x6e, 0x12, 0x2c, 0x0a, 0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x74, 0x68, 0x65, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c,
+	0x72, 0x6f, 0x62, 0x6f, 0x74, 0x2e, 0x44, 0x61, 0x74, 0x65, 0x52, 0x06, 0x61, 0x63, 0x74, 0x69,
+	0x6f, 0x6e, 0x22, 0x31, 0x0a, 0x0b, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x45, 0x76, 0x65, 0x6e,
+	0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
+	0x64, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x64, 0x61, 0x74, 0x65, 0x32, 0x5f, 0x0a, 0x0e, 0x54, 0x68, 0x65, 0x53, 0x6f, 0x63, 0x69,
+	0x61, 0x6c, 0x52, 0x6f, 0x62, 0x6f, 0x74, 0x12, 0x4d, 0x0a, 0x0b, 0x45, 0x76, 0x65, 0x6e, 0x74,
+	0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x12, 0x1b, 0x2e, 0x74, 0x68, 0x65, 0x73, 0x6f, 0x63, 0x69,
+	0x61, 0x6c, 0x72, 0x6f, 0x62, 0x6f, 0x74, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x45, 0x76,
+	0x65, 0x6e, 0x74, 0x1a, 0x1b, 0x2e, 0x74, 0x68, 0x65, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x72,
+	0x6f, 0x62, 0x6f, 0x74, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x45, 0x76, 0x65, 0x6e, 0x74,
+	0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x42, 0x11, 0x5a, 0x0f, 0x61, 0x70, 0x69, 0x73, 0x2f, 0x67,
+	0x72, 0x70, 0x63, 0x73, 0x72, 0x76, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -356,25 +444,28 @@ func file_grpcsrv_v1_grpcsrv_proto_rawDescGZIP() []byte {
 	return file_grpcsrv_v1_grpcsrv_proto_rawDescData
 }
 
-var file_grpcsrv_v1_grpcsrv_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_grpcsrv_v1_grpcsrv_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_grpcsrv_v1_grpcsrv_proto_goTypes = []interface{}{
-	(*ClientEvent)(nil), // 0: thesocialrobot.ClientEvent
-	(*Say)(nil),         // 1: thesocialrobot.Say
-	(*Date)(nil),        // 2: thesocialrobot.Date
-	(*Action)(nil),      // 3: thesocialrobot.Action
-	(*ServerEvent)(nil), // 4: thesocialrobot.ServerEvent
+	(*Start)(nil),       // 0: thesocialrobot.Start
+	(*Callback)(nil),    // 1: thesocialrobot.Callback
+	(*ClientEvent)(nil), // 2: thesocialrobot.ClientEvent
+	(*Say)(nil),         // 3: thesocialrobot.Say
+	(*Date)(nil),        // 4: thesocialrobot.Date
+	(*Action)(nil),      // 5: thesocialrobot.Action
+	(*ServerEvent)(nil), // 6: thesocialrobot.ServerEvent
 }
 var file_grpcsrv_v1_grpcsrv_proto_depIdxs = []int32{
-	1, // 0: thesocialrobot.Action.say:type_name -> thesocialrobot.Say
-	2, // 1: thesocialrobot.Action.date:type_name -> thesocialrobot.Date
-	3, // 2: thesocialrobot.ServerEvent.actions:type_name -> thesocialrobot.Action
-	0, // 3: thesocialrobot.TheSocialRobot.EventStream:input_type -> thesocialrobot.ClientEvent
-	4, // 4: thesocialrobot.TheSocialRobot.EventStream:output_type -> thesocialrobot.ServerEvent
-	4, // [4:5] is the sub-list for method output_type
-	3, // [3:4] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	6, // 0: thesocialrobot.Callback.event:type_name -> thesocialrobot.ServerEvent
+	0, // 1: thesocialrobot.ClientEvent.start:type_name -> thesocialrobot.Start
+	1, // 2: thesocialrobot.ClientEvent.callback:type_name -> thesocialrobot.Callback
+	4, // 3: thesocialrobot.Action.action:type_name -> thesocialrobot.Date
+	2, // 4: thesocialrobot.TheSocialRobot.EventStream:input_type -> thesocialrobot.ClientEvent
+	6, // 5: thesocialrobot.TheSocialRobot.EventStream:output_type -> thesocialrobot.ServerEvent
+	5, // [5:6] is the sub-list for method output_type
+	4, // [4:5] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_grpcsrv_v1_grpcsrv_proto_init() }
@@ -384,7 +475,7 @@ func file_grpcsrv_v1_grpcsrv_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_grpcsrv_v1_grpcsrv_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientEvent); i {
+			switch v := v.(*Start); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -396,7 +487,7 @@ func file_grpcsrv_v1_grpcsrv_proto_init() {
 			}
 		}
 		file_grpcsrv_v1_grpcsrv_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Say); i {
+			switch v := v.(*Callback); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -408,7 +499,7 @@ func file_grpcsrv_v1_grpcsrv_proto_init() {
 			}
 		}
 		file_grpcsrv_v1_grpcsrv_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Date); i {
+			switch v := v.(*ClientEvent); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -420,7 +511,7 @@ func file_grpcsrv_v1_grpcsrv_proto_init() {
 			}
 		}
 		file_grpcsrv_v1_grpcsrv_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Action); i {
+			switch v := v.(*Say); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -432,6 +523,30 @@ func file_grpcsrv_v1_grpcsrv_proto_init() {
 			}
 		}
 		file_grpcsrv_v1_grpcsrv_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Date); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_grpcsrv_v1_grpcsrv_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Action); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_grpcsrv_v1_grpcsrv_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ServerEvent); i {
 			case 0:
 				return &v.state
@@ -444,9 +559,9 @@ func file_grpcsrv_v1_grpcsrv_proto_init() {
 			}
 		}
 	}
-	file_grpcsrv_v1_grpcsrv_proto_msgTypes[3].OneofWrappers = []interface{}{
-		(*Action_Say)(nil),
-		(*Action_Date)(nil),
+	file_grpcsrv_v1_grpcsrv_proto_msgTypes[2].OneofWrappers = []interface{}{
+		(*ClientEvent_Start)(nil),
+		(*ClientEvent_Callback)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -454,7 +569,7 @@ func file_grpcsrv_v1_grpcsrv_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_grpcsrv_v1_grpcsrv_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

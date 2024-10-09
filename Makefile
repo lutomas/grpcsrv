@@ -69,51 +69,13 @@ build:
 build-osx:
 	cd cmd/fleet-node-daemon && CGO_ENABLED=0 go build -mod vendor -ldflags "$(LDFLAGS)" -o fleet-node-daemon .
 
-stresser:
-	cd cmd/stresser && CGO_ENABLED=0 GOOS=linux go build -mod vendor -ldflags "$(LDFLAGS)" -o stresser .
-	gcloud compute scp cmd/stresser/stresser instance-20240508-114427:/data/deliust/stresser --project deliust-staging
-
 .PHONY: test
 test:
 	go test -mod vendor `go list ./... | egrep -v /tests/`
 
-run: build
-	./cmd/fleet-node-daemon/fleet-node-daemon
-
-run-osx: build-osx
-	./cmd/fleet-node-daemon/fleet-node-daemon
-
-# Start virtual card reader that the daemon can connect to. This server has several HTTP APIs that can
-# be used for integration testing and development
-
-run-virtual-reader:
-	cd cmd/virtual-card-reader && go install
-	virtual-card-reader
-
-cli:
-	cd cmd/fncli && go install
-
 fetch-certs:
 	curl -L --remote-name --time-cond cacert.pem https://curl.se/ca/cacert.pem
 	cp cacert.pem ca-certificates.crt
-
-.PHONY: build-armhf
-build-armhf:
-	cd cmd/fleet-node-daemon && env CGO_ENABLED=0 GOARCH=arm GOOS=linux go build -mod vendor -ldflags="$(LDFLAGS)" -o release/fleet-node-daemon-linux-arm
-
-# Currently not used in the normal build process
-compress-arm:
-	upx --brute cmd/fleet-node-daemon/release/fleet-node-daemon-linux-arm
-
-# Build and push arm dev image
-armhf: build-armhf
-	docker build -t ghcr.io/apollo-hq/fleet-node-daemon:$(SHORT_SHA) -f Dockerfile.armhf .
-	docker push ghcr.io/apollo-hq/fleet-node-daemon:$(SHORT_SHA)
-
-arm: armhf
-
-amd64:
-	docker build -t quay.io/apollo-technologies/fleet-node-daemon-amd64:dev -f Dockerfile .
 
 ##############################
 #         Bundler            #
@@ -146,28 +108,3 @@ local-proto-lint: $(BUF)
 
 proto:
 	buf generate --template buf.gen.yaml
-
-generate:
-	go generate ./...
-
-lint:
-	$(GOLANGCI_LINT) run
-
-arm-virtual-info-server:
-	cd cmd/virtual-info-server && env CGO_ENABLED=0 GOARCH=arm GOOS=linux go build -ldflags="$(LDFLAGS)" -o release/virtual-info-server-arm
-	docker build -t ghcr.io/apollo-hq/virtual-info-server:latest-arm -f Dockerfile.virtual-info-server.armhf .
-	docker push ghcr.io/apollo-hq/virtual-info-server:latest-arm
-
-arm-virtual-card-reader:
-	cd cmd/virtual-card-reader && env CGO_ENABLED=0 GOARCH=arm GOOS=linux go build -ldflags="$(LDFLAGS)" -o release/virtual-card-reader-arm
-	docker build -t ghcr.io/apollo-hq/virtual-card-reader:latest-arm -f Dockerfile.virtual-reader.armhf .
-	docker push ghcr.io/apollo-hq/virtual-card-reader:latest-arm
-
-##############################
-#     Third-party tools      #
-##############################
-
-golangci-lint: ## Install golangci-lint
-	@if [ ! -f $(GOLANGCI_LINT) ]; then \
-		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(BUILD_DIR) v1.27.0; \
-	fi

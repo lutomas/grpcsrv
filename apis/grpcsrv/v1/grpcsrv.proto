@@ -8,9 +8,19 @@ service TheSocialRobot {
   rpc EventStream(stream ClientEvent) returns (stream ServerEvent) {}
 }
 
+message Start {
+}
+message Callback {
+  ServerEvent event = 1;
+}
+
 // event from robot (the body) containing current state
 message ClientEvent {
-  int32 id = 1;
+  string id = 1;
+  oneof action {
+    Start start = 2;
+    Callback callback = 3;
+  }
 }
 
 message Say {
@@ -21,18 +31,11 @@ message Date {
 }
 
 message Action {
-  // delay in milliseconds before triggering the action
-  // could use the Duration type here, but don't think we need nanosecond
-  // precision and the second/nanosecond split complicates things
-  int32 delay = 1;
-  oneof action {
-    Say say = 2;
-    Date date = 3;
-  }
+  Date action = 1;
 }
 
 // message from brain to body, instructing the body do take one or more actions
 message ServerEvent {
-  int32 id = 1;
-  repeated Action actions = 2;
+  string id = 1;
+  string date = 2;
 }

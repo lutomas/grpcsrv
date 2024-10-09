@@ -28,16 +28,13 @@ func main() {
 
 type theSocialRobotServer struct {
 	pb.UnimplementedTheSocialRobotServer
-	currentStream pb.TheSocialRobot_EventStreamServer
+	currentStream   pb.TheSocialRobot_EventStreamServer
+	lastServerEvent *pb.ServerEvent
+	callbackChan    chan bool
 }
 
 func (s *theSocialRobotServer) EventStream(stream pb.TheSocialRobot_EventStreamServer) error {
 	for {
-		if s.currentStream == nil {
-			s.currentStream = stream
-			go s.simulate()
-		}
-
 		// TODO handle events from the client
 		event, err := stream.Recv()
 		if err == io.EOF {
@@ -47,27 +44,40 @@ func (s *theSocialRobotServer) EventStream(stream pb.TheSocialRobot_EventStreamS
 			return err
 		}
 
-		log.Printf("Received event '%d'", event.Id)
-		//// respond with a single command
-		//// TODO eventually we'll decouple receiving events from sending commands
-		//command := &pb.ServerEvent{
-		//	Id:      event.Id,
-		//	Actions: []*pb.Action{{Delay: 0, Action: &pb.Action_Say{Say: &pb.Say{Text: "Hello World"}}}},
-		//}
-		//stream.Send(command)
+		switch op := event.Action.(type) {
+		case *pb.ClientEvent_Start:
+			log.Printf("Received start '%s'", event.Id)
+			if s.currentStream == nil {
+				s.currentStream = stream
+				go s.simulate()
+			}
+		case *pb.ClientEvent_Callback:
+			// Verify if callback is same as lastServerEvent
+			if s.lastServerEvent != nil && s.lastServerEvent.Id == op.Callback.Event.Id {
+				// TODO release chanel
+				s.callbackChan <- true
+				s.lastServerEvent = nil
+				log.Printf("OK: Received expected callback '%s' -'%s' - '%s'", event.Id, op.Callback.Event.Date, time.Now().Format(time.RFC3339Nano))
+			} else {
+				log.Printf("ERR: Received callbackChan '%s'", event.Id)
+			}
+		}
 	}
 }
 
 func (s *theSocialRobotServer) simulate() {
+	s.callbackChan = make(chan bool)
 	defer func() {
 		s.currentStream = nil
+		close(s.callbackChan)
 	}()
 	eventID := int32(0)
 	for {
-
+		eventID = eventID + 1
 		command := &pb.ServerEvent{
-			Id:      eventID,
-			Actions: []*pb.Action{{Delay: 0, Action: &pb.Action_Date{Date: &pb.Date{Text: time.Now().Format(time.RFC3339Nano)}}}}}
+			Id:   fmt.Sprintf("srv:%d", eventID),
+			Date: time.Now().Format(time.RFC3339Nano),
+		}
 
 		err := s.currentStream.Send(command)
 		if err != nil {
@@ -75,7 +85,9 @@ func (s *theSocialRobotServer) simulate() {
 			break
 		}
 
-		fmt.Printf("Sent command to server: %v\n", command)
-		time.Sleep(time.Second)
+		fmt.Printf("Simulated event: %v\n", command)
+		s.lastServerEvent = command
+		<-s.callbackChan
+		time.Sleep(1 * time.Second)
 	}
 }
