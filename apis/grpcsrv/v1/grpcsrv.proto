@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+option go_package = "apis/grpcsrv/v1";
+
+package thesocialrobot;
+
+service TheSocialRobot {
+  rpc EventStream(stream ClientEvent) returns (stream ServerEvent) {}
+}
+
+// event from robot (the body) containing current state
+message ClientEvent {
+  int32 id = 1;
+}
+
+message Say {
+  string text = 1;
+}
+
+message Action {
+  // delay in milliseconds before triggering the action
+  // could use the Duration type here, but don't think we need nanosecond
+  // precision and the second/nanosecond split complicates things
+  int32 delay = 1;
+  oneof action {
+    Say say = 2;
+  }
+}
+
+// message from brain to body, instructing the body do take one or more actions
+message ServerEvent {
+  int32 id = 1;
+  repeated Action actions = 2;
+}
