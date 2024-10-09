@@ -27,18 +27,17 @@ func main() {
 }
 
 func runEventStream(client pb.TheSocialRobotClient) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	//ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	//defer cancel()
+	ctx := context.Background()
 	stream, err := client.EventStream(ctx)
 	if err != nil {
 		log.Fatalf("client.EventStream failed: %v", err)
 	}
 
-	for i := 0; i < 5; i++ {
-		event := &pb.ClientEvent{Id: int32(i + 1)}
-		if err := stream.Send(event); err != nil {
-			log.Fatalf("client.EventStream: stream.Send(%v) failed: %v", event, err)
-		}
+	event := &pb.ClientEvent{Id: int32(0)}
+	if err := stream.Send(event); err != nil {
+		log.Fatalf("client.EventStream: stream.Send(%v) failed: %v", event, err)
 	}
 
 	waitc := make(chan struct{})
@@ -46,8 +45,11 @@ func runEventStream(client pb.TheSocialRobotClient) {
 		for {
 			in, err := stream.Recv()
 			if err == io.EOF {
-				close(waitc)
-				return
+				log.Println("EOF")
+				//close(waitc)
+				//return
+				time.Sleep(500 * time.Millisecond)
+				continue
 			}
 			if err != nil {
 				log.Fatalf("client.EventStream failed: %v", err)
@@ -57,6 +59,8 @@ func runEventStream(client pb.TheSocialRobotClient) {
 				switch op := action.Action.(type) {
 				case *pb.Action_Say:
 					log.Printf("delay %d, say %s", action.Delay, op.Say.Text)
+				case *pb.Action_Date:
+					log.Printf("delay %d, date %s", action.Delay, op.Date.Text)
 				}
 			}
 		}
@@ -65,6 +69,6 @@ func runEventStream(client pb.TheSocialRobotClient) {
 	//if err := stream.Send(event); err != nil {
 	//	log.Fatalf("client.EventStream: stream.Send(%v) failed: %v", event, err)
 	//}
-	stream.CloseSend()
+	defer stream.CloseSend()
 	<-waitc
 }

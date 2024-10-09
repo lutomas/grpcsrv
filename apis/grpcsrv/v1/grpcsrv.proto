@@ -16,7 +16,7 @@ message ClientEvent {
 message Say {
   string text = 1;
 }
-message Print {
+message Date {
   string text = 1;
 }
 
@@ -27,7 +27,7 @@ message Action {
   int32 delay = 1;
   oneof action {
     Say say = 2;
-    Print print = 3;
+    Date date = 3;
   }
 }
 
